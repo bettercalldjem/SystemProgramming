@@ -1,4 +1,4 @@
-using System.Diagnostics;
+/*using System.Diagnostics;
 Process[] processes = Process.GetProcesses();
 foreach (Process process in processes)
 {
@@ -16,5 +16,103 @@ foreach (Process process in processes)
         Console.WriteLine("Процесса с таким ID не существует");
     }
 }
+*/
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 
+class Program
+{
+    static void Main(string[] args)
+    {
+        while (true)
+        {
+            DisplayProcesses();
+            Console.WriteLine("\nВыберите действие:");
+            Console.WriteLine("1. Завершить процесс по ID");
+            Console.WriteLine("2. Запустить новый процесс (например, блокнот)");
+            Console.WriteLine("3. Выход");
 
+            var choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Введите ID процесса для завершения: ");
+                    if (int.TryParse(Console.ReadLine(), out int processId))
+                    {
+                        KillProcess(processId);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Некорректный ID процесса.");
+                    }
+                    break;
+
+                case "2":
+                    Console.Write("Введите имя процесса для запуска (например, notepad.exe): ");
+                    string processName = Console.ReadLine();
+                    StartProcess(processName);
+                    break;
+
+                case "3":
+                    return;
+
+                default:
+                    Console.WriteLine("Некорректный выбор. Пожалуйста, попробуйте снова.");
+                    break;
+            }
+
+            Console.WriteLine("Нажмите любую клавишу для продолжения...");
+            Console.ReadKey();
+        }
+    }
+
+    static void DisplayProcesses()
+    {
+        var processes = Process.GetProcesses();
+        foreach (var process in processes)
+        {
+            Console.WriteLine($"Имя процесса: {process.ProcessName}, ID: {process.Id}, Память: {(process.WorkingSet64 / 1024) / 1024} MB, Состояние: {process.Responding}");
+        }
+    }
+
+    static void KillProcess(int processId)
+    {
+        try
+        {
+            var process = Process.GetProcessById(processId);
+            process.Kill();
+            LogAction($"Завершен процесс: {process.ProcessName} (ID: {processId})");
+            Console.WriteLine($"Процесс {process.ProcessName} (ID: {processId}) завершен.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+
+    static void StartProcess(string processName)
+    {
+        try
+        {
+            Process.Start(processName);
+            LogAction($"Запущен процесс: {processName}");
+            Console.WriteLine($"Процесс {processName} запущен.");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+
+    static void LogAction(string message)
+    {
+        string logFilePath = "process_log.txt";
+        using (StreamWriter writer = new StreamWriter(logFilePath, true))
+        {
+            writer.WriteLine($"{DateTime.Now}: {message}");
+        }
+    }
+}
