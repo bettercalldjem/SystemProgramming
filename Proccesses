@@ -1,0 +1,20 @@
+using System.Diagnostics;
+Process[] processes = Process.GetProcesses();
+foreach (Process process in processes)
+{
+    Console.WriteLine($"ID: {process.Id}| Имя процесса: {process.ProcessName}| Потребление ОП: {(process.PagedMemorySize64 / 1024) / 1024} МБ| Статус процесса:  ");
+}
+foreach (Process process in processes)
+{
+    int id = int.Parse(Console.ReadLine());
+    if (id == process.Id)
+    {
+        process.Kill();
+    }
+    else
+    {
+        Console.WriteLine("Процесса с таким ID не существует");
+    }
+}
+
+
