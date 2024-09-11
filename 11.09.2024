@@ -1,0 +1,73 @@
+/*//task 1
+static void WorkWithFiles()
+{
+    string file = "C:\\Users\\Student406-11\\Desktop\\file.txt";
+
+    string[] lines = File.ReadAllLines(file);
+    Console.WriteLine("||||Чтение файла||||");
+    foreach (string line in lines)
+    {
+        Console.WriteLine(line);
+    }
+
+    Console.WriteLine("Введите строку, которую вы хотите добавить в файл");
+    using (StreamWriter writer = new StreamWriter(file, true))
+    {
+        string data = Console.ReadLine();
+        writer.WriteLine(data);
+    }
+
+    Console.WriteLine("Данные успешно добавлены в файл.");
+    string[] lin = File.ReadAllLines(file);
+    Console.WriteLine("||||Чтение файла||||");
+    foreach (string line in lin)
+    {
+        Console.WriteLine(line);
+    }
+}
+
+WorkWithFiles();*/
+/*//task 2 
+class DataProcessor
+{
+    private object lockObject = new object();
+    private int[] data; 
+
+    public void ProcessData()
+    {
+        string filePath = "C:\\Users\\Student406-11\\source\\repos\\122practice\\122practice\\bin\\Debug\\net8.0\\data.txt";
+        string[] lines = File.ReadAllLines(filePath);
+        data = Array.ConvertAll(lines, int.Parse);
+        Thread avgThread = new Thread(CalculateAverage);
+        Thread maxThread = new Thread(FindMaximum);
+        avgThread.Start();
+        maxThread.Start();
+    }
+
+    private void CalculateAverage()
+    {
+        Monitor.Enter(lockObject); 
+        double average = data.Average();
+        Monitor.Exit(lockObject);
+
+        Console.WriteLine($"Среднее значение: {average}");
+    }
+
+    private void FindMaximum()
+    {
+        Monitor.Enter(lockObject); 
+        int max = data.Max();
+        Monitor.Exit(lockObject); 
+
+        Console.WriteLine($"Максимальное значение: {max}");
+    }
+}
+
+class Programр
+{
+    static void Main()
+    {
+        DataProcessor processor = new DataProcessor();
+        processor.ProcessData();
+    }
+}*/
