@@ -1,33 +1,43 @@
-/*//task 1
-static void WorkWithFiles()
-{
-    string file = "C:\\Users\\Student406-11\\Desktop\\file.txt";
+//Задание 1
+//using System;
+//using System.IO;
 
-    string[] lines = File.ReadAllLines(file);
-    Console.WriteLine("||||Чтение файла||||");
-    foreach (string line in lines)
-    {
-        Console.WriteLine(line);
-    }
+//static void WorkWithFiles()
+//{
+//    string file = "C:\\Users\\Student406-11\\Desktop\\file.txt";
+//    string dat = "";
+//    string[] lines = File.ReadAllLines(file);
+//    Console.WriteLine("||||Чтение файла||||");
+//    foreach (string line in lines)
+//    {
+//        Console.WriteLine(line);
+//    }
 
-    Console.WriteLine("Введите строку, которую вы хотите добавить в файл");
-    using (StreamWriter writer = new StreamWriter(file, true))
-    {
-        string data = Console.ReadLine();
-        writer.WriteLine(data);
-    }
+//    Console.WriteLine("Введите строку, которую вы хотите добавить в файл");
+//    using (StreamWriter writer = new StreamWriter(file, true))
+//    {
+//        string data = Console.ReadLine();
+//        writer.WriteLine(data);
+//        dat = data;
+//    }
 
-    Console.WriteLine("Данные успешно добавлены в файл.");
-    string[] lin = File.ReadAllLines(file);
-    Console.WriteLine("||||Чтение файла||||");
-    foreach (string line in lin)
-    {
-        Console.WriteLine(line);
-    }
-}
+//    Console.WriteLine("Данные успешно добавлены в файл.");
+//    string[] lin = File.ReadAllLines(file);
+//    Console.WriteLine("||||Чтение файла||||");
+//    foreach (string line in lin)
+//    {
+//        Console.WriteLine(line);
+//    }
+//    string log = "C:\\Users\\Student406-11\\Desktop\\log.txt";
+//    using (StreamWriter write = new StreamWriter(log, true))
+//    {
+//        string logi = DateTime.Now + " Добавили в файл file.txt строку " + dat;
+//        write.WriteLine(logi);
+//    }
+//}
 
-WorkWithFiles();*/
-/*//task 2 
+//WorkWithFiles();
+//Задание 2
 class DataProcessor
 {
     private object lockObject = new object();
@@ -70,4 +80,30 @@ class Programр
         DataProcessor processor = new DataProcessor();
         processor.ProcessData();
     }
-}*/
+}
+//Задание 3
+//using System;
+//using System.Net.Http;
+//using System.Threading.Tasks;
+//using Newtonsoft.Json;
+
+//namespace HttpClientSample
+//{
+//    class Program
+//    {
+//        static async Task Main(string[] args)
+//        {
+//            using (var client = new HttpClient())
+//            {             
+//                await GetDataFromServer();
+//            }
+//        }
+
+//        static async Task GetDataFromServer()
+//        {
+//            HttpClient client = new HttpClient();
+//            string result = await client.GetStringAsync("https://jsonplaceholder.typicode.com/posts");
+//            Console.WriteLine(result);
+//        }
+//    }
+//}
