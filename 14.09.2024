@@ -1,0 +1,81 @@
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ProcessScheduler
+{
+    public class Process
+    {
+        public int Id { get; set; }
+        public int BurstTime { get; set; }
+        public int Priority { get; set; }
+    }
+
+    public class ProcessScheduler
+    {
+        private Queue<Process> processQueue;
+        private int quantumTime;
+
+        public ProcessScheduler(int quantumTime = 2)
+        {
+            this.processQueue = new Queue<Process>();
+            this.quantumTime = quantumTime;
+        }
+
+        public void AddProcess(Process process)
+        {
+            processQueue.Enqueue(process);
+        }
+
+        public async Task RunRoundRobin()
+        {
+            while (processQueue.Count > 0)
+            {
+                Process currentProcess = processQueue.Dequeue();
+
+                Console.WriteLine($"Процесс {currentProcess.Id} начал выполнение");
+
+                for (int i = 0; i < currentProcess.BurstTime; i += quantumTime)
+                {
+                    await Task.Delay(quantumTime * 1000);
+                    Console.WriteLine($"Процесс {currentProcess.Id} выполняется (осталось {currentProcess.BurstTime - i} секунд)");
+
+                    if (i + quantumTime >= currentProcess.BurstTime)
+                    {
+                        Console.WriteLine($"Процесс {currentProcess.Id} завершён");
+                        break;
+                    }
+
+                    processQueue.Enqueue(currentProcess);
+                }
+            }
+        }
+
+        class Program
+        {
+            static void Main(string[] args)
+            {
+
+                List<Process> processes = new List<Process>
+            {
+                new Process { Id = 1, BurstTime = 5, Priority = 2 },
+                new Process { Id = 2, BurstTime = 3, Priority = 1 },
+                new Process { Id = 3, BurstTime = 8, Priority = 3 }
+            };
+
+                ProcessScheduler scheduler = new ProcessScheduler();
+
+                foreach (Process process in processes)
+                {
+                    scheduler.AddProcess(process);
+                }
+
+
+                scheduler.RunRoundRobin();
+
+                Console.ReadLine();
+            }
+        }
+    }
+}
