@@ -1,0 +1,163 @@
+using System;
+using SharpPcap;
+using PacketDotNet;
+using System.Collections.Generic;
+
+class Program
+{
+    static Dictionary<string, int> packetCountByType = new Dictionary<string, int>();
+    static Dictionary<string, int> packetCountByIp = new Dictionary<string, int>();
+    static long totalBytes = 0;
+
+    static void Main(string[] args)
+    {
+        try
+        {
+            var devices = CaptureDeviceList.Instance;
+            if (devices.Count < 1)
+            {
+                Console.WriteLine("Нет доступных сетевых интерфейсов.");
+                return;
+            }
+
+
+            Console.WriteLine("Доступные сетевые устройства:");
+            for (int i = 0; i < devices.Count; i++)
+            {
+                Console.WriteLine($"{i}) {devices[i].Description}");
+            }
+
+
+            Console.Write("Выберите номер устройства для мониторинга: ");
+            int deviceIndex = int.Parse(Console.ReadLine());
+            var device = devices[deviceIndex];
+
+
+            device.OnPacketArrival += new PacketArrivalEventHandler(OnPacketArrival);
+            device.Open(); 
+            Console.WriteLine($"Начало мониторинга на устройстве: {device.Description}");
+
+
+            device.StartCapture();
+
+
+            while (true)
+            {
+                Console.WriteLine("Введите команду (filter, stats, exit): ");
+                string command = Console.ReadLine();
+
+                if (command == "exit")
+                {
+                    device.StopCapture();
+                    device.Close();
+                    break;
+                }
+                else if (command == "filter")
+                {
+                    Console.Write("Введите IP-адрес или тип протокола (TCP/UDP): ");
+                    string filter = Console.ReadLine();
+                    ApplyFilter(filter);
+                }
+                else if (command == "stats")
+                {
+                    PrintStatistics();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+
+
+    private static void OnPacketArrival(object sender, PacketCapture e)
+    {
+        try
+        {
+
+            var rawPacket = e.GetPacket();
+            var packet = PacketDotNet.Packet.ParsePacket(rawPacket.LinkLayerType, rawPacket.Data);
+
+            var ipPacket = packet.Extract<IPPacket>();
+
+            if (ipPacket != null)
+            {
+                string srcIp = ipPacket.SourceAddress.ToString();
+                string dstIp = ipPacket.DestinationAddress.ToString();
+                int packetSize = rawPacket.Data.Length;
+                totalBytes += packetSize;
+
+                if (packet is TcpPacket)
+                {
+                    Console.WriteLine($"TCP пакет: {srcIp} -> {dstIp}, Размер: {packetSize} байт");
+                    IncrementPacketCount("TCP");
+                }
+                else if (packet is UdpPacket)
+                {
+                    Console.WriteLine($"UDP пакет: {srcIp} -> {dstIp}, Размер: {packetSize} байт");
+                    IncrementPacketCount("UDP");
+                }
+                else if (packet is IcmpV4Packet)
+                {
+                    Console.WriteLine($"ICMP пакет: {srcIp} -> {dstIp}, Размер: {packetSize} байт");
+                    IncrementPacketCount("ICMP");
+                }
+
+
+                IncrementPacketCountByIp(srcIp);
+                IncrementPacketCountByIp(dstIp);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при обработке пакета: {ex.Message}");
+        }
+    }
+
+    private static void ApplyFilter(string filter)
+    {
+        Console.WriteLine($"Фильтрация пакетов по: {filter}");
+       
+    }
+    private static void IncrementPacketCount(string type)
+    {
+        if (packetCountByType.ContainsKey(type))
+        {
+            packetCountByType[type]++;
+        }
+        else
+        {
+            packetCountByType[type] = 1;
+        }
+    }
+
+    private static void IncrementPacketCountByIp(string ip)
+    {
+        if (packetCountByIp.ContainsKey(ip))
+        {
+            packetCountByIp[ip]++;
+        }
+        else
+        {
+            packetCountByIp[ip] = 1;
+        }
+    }
+
+    private static void PrintStatistics()
+    {
+        Console.WriteLine("Статистика перехваченных пакетов:");
+        foreach (var entry in packetCountByType)
+        {
+            Console.WriteLine($"{entry.Key}: {entry.Value} пакетов");
+        }
+
+        Console.WriteLine($"Общий объем данных: {totalBytes} байт");
+
+        Console.WriteLine("Количество пакетов по IP:");
+        foreach (var entry in packetCountByIp)
+        {
+            Console.WriteLine($"{entry.Key}: {entry.Value} пакетов");
+        }
+    }
+}
